@@ -6,9 +6,10 @@ public class UI {
     Graphics2D g2;
     public boolean messageOn = false;
     public String message = "";
+    public int commandNum = 0;
     public UI(GamePanel gp){
-        this.gp = gp;
 
+        this.gp = gp;
         font = new Font("Arial", Font.BOLD, 36);
     }
     public void showMessage(String text){
@@ -22,13 +23,70 @@ public class UI {
         g2.setFont(font);
         g2.setColor(Color.GREEN);
 
+        if (gp.gameState == gp.titleState){
+            drawTitleScreen();
+        }
         if (gp.gameState == gp.playState){
 
-        } else if (gp.gameState == gp.pauseState) {
+        }
+        if (gp.gameState == gp.pauseState) {
             drawPauseScreen(g2);
         }
     }
+
+    private void drawTitleScreen() {
+
+        g2.setFont(g2.getFont().deriveFont(Font.ITALIC,50));
+        String text = "Super Hexagon";
+
+        g2.setColor(Color.DARK_GRAY);
+        g2.drawString(text,gp.centerX - 187,gp.centerY - 172);
+
+        g2.setFont(g2.getFont().deriveFont(Font.ITALIC,50));
+        text = "Super Hexagon";
+
+        g2.setColor(Color.RED);
+        g2.drawString(text,gp.centerX - 185,gp.centerY - 175);
+
+        text = "Created By : Arshian flh";
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD,12));
+        g2.setColor(Color.YELLOW);
+        g2.drawString(text,gp.centerX - 220,gp.centerY + 200);
+
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD,30));
+        text = "New Game";
+        g2.setColor(Color.WHITE);
+        g2.drawString(text,gp.centerX - 80,gp.centerY - 70);
+        if (commandNum == 0){
+            g2.drawString(">" , gp.centerX - 110,gp.centerY - 70);
+        }
+
+        text = "Previous Runs";
+        g2.drawString(text,gp.centerX - 80,gp.centerY - 30);
+        if (commandNum == 1){
+            g2.drawString(">" , gp.centerX - 110,gp.centerY - 30);
+        }
+
+        text = "Settings";
+        g2.drawString(text,gp.centerX - 80,gp.centerY + 10);
+        if (commandNum == 2){
+            g2.drawString(">" , gp.centerX - 110,gp.centerY + 10);
+        }
+
+        text = "Quit";
+        g2.drawString(text,gp.centerX - 80,gp.centerY + 50);
+        if (commandNum == 3){
+            g2.drawString(">" , gp.centerX - 110,gp.centerY + 50);
+        }
+
+        text = "Best run:";
+        g2.setColor(Color.GRAY);
+        g2.drawString(text,gp.centerX - 220,gp.centerY + 135);
+
+    }
+
     private void drawPauseScreen(Graphics2D g2) {
+
         String text = "PAUSED";
         Font font = new Font("Arial", Font.BOLD, 36);
         g2.setFont(font);

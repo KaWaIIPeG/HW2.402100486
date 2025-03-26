@@ -6,9 +6,10 @@ import java.io.File;
 public class Sound {
     Clip clip;
     String[] soundFilePaths = new String[1];
+    long clipTimePosition = 0;
 
     public Sound() {
-        soundFilePaths[0] = "C:\\Users\\GS\\HW2.402100486\\sound\\01 Courtesy.wav";
+        soundFilePaths[0] = "C:\\Users\\GS\\HW2.402100486\\sound\\Turbo-Killer.wav";
     }
 
     public void setFile(int i) {
@@ -24,6 +25,7 @@ public class Sound {
 
     public void play() {
         if (clip != null) {
+            clip.setMicrosecondPosition(clipTimePosition);
             clip.start();
         }
     }
@@ -34,12 +36,17 @@ public class Sound {
         }
     }
 
-    public void stop() {
-        if (clip != null) {
+    public void pause() {
+        if (clip != null && clip.isRunning()) {
+            clipTimePosition = clip.getMicrosecondPosition();
             clip.stop();
         }
     }
-    public boolean isPlaying() {
-        return clip != null && clip.isRunning();
+
+    public void stop() {
+        if (clip != null) {
+            clipTimePosition = 0;
+            clip.stop();
+        }
     }
 }

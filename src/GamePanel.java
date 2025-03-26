@@ -5,6 +5,7 @@ import java.awt.geom.AffineTransform;
 public class GamePanel extends JPanel implements Runnable {
 
     public int gameState;
+    public final int titleState = 0;
     public final int playState = 1;
     public final int pauseState = 2;
     public Graphics2D g2;
@@ -19,6 +20,7 @@ public class GamePanel extends JPanel implements Runnable {
     public UI ui = new UI(this);
 
     GamePanel() {
+
         this.setPreferredSize(new Dimension(500, 500));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
@@ -29,8 +31,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         gameThread = new Thread(this);
         gameThread.start();
-        playMusic(0);
-        gameState = playState;
+        //playMusic(0);
+        gameState = titleState;
     }
 
     @Override
@@ -82,24 +84,26 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         Polygon hexagon = new Polygon(xPoints, yPoints, 6);
-        g2.setPaint(Color.MAGENTA);
+        g2.setPaint(Color.RED);
         g2.fillPolygon(hexagon);
     }
 
     public void update() {
+
         if (gameState == playState){
             cursor.update();
             rotationAngle += 0.01;
         }
     }
     public void setGameState(int newState) {
+
         if (gameState != newState) {
             gameState = newState;
 
             if (gameState == playState) {
                 playMusic(0);
             } else if (gameState == pauseState) {
-                stopMusic();
+                pauseMusic();
             }
         }
     }
@@ -108,20 +112,27 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
         g2 = (Graphics2D) g;
 
-        AffineTransform originalTransform = g2.getTransform();
+        if (gameState == titleState){
 
-        g2.translate(centerX, centerY);
-        g2.rotate(rotationAngle);
-        g2.translate(-centerX, -centerY);
+            ui.draw(g2);
+        }
+        else {
+
+            AffineTransform originalTransform = g2.getTransform();
+
+            g2.translate(centerX, centerY);
+            g2.rotate(rotationAngle);
+            g2.translate(-centerX, -centerY);
 
             centerHexagon();
             cursor.draw(g2);
 
-        g2.setTransform(originalTransform);
+            g2.setTransform(originalTransform);
 
-        ui.draw(g2);
+            ui.draw(g2);
 
-        g2.dispose();
+            g2.dispose();
+        }
     }
     public void playMusic(int i){
 
@@ -132,5 +143,9 @@ public class GamePanel extends JPanel implements Runnable {
     public void stopMusic(){
 
         sound.stop();
+    }
+    public void pauseMusic(){
+
+        sound.pause();
     }
 }

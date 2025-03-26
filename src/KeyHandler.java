@@ -18,13 +18,45 @@ public class KeyHandler implements KeyListener {
 
         int code = e.getKeyCode();
 
+        if (gp.gameState == gp.titleState){
+            if (code == KeyEvent.VK_W){
+                gp.ui.commandNum--;
+                if (gp.ui.commandNum < 0){
+                    gp.ui.commandNum = 3;
+                }
+            }
+            if (code == KeyEvent.VK_S){
+                gp.ui.commandNum++;
+                if (gp.ui.commandNum > 3){
+                    gp.ui.commandNum = 0;
+                }
+            }
+            if (code == KeyEvent.VK_ENTER){
+                switch(gp.ui.commandNum){
+                    case 0 :
+                        gp.gameState = gp.playState;
+                        gp.playMusic(0);
+                        break;
+                    case 1 :
+                        //add later.
+                        break;
+                    case 2 :
+                        //add later.
+                        break;
+                    case 3 :
+                        System.exit(0);
+                        break;
+                }
+            }
+        }
+
         if (code == KeyEvent.VK_A){
             leftPressed = true;
         }
         if (code == KeyEvent.VK_D){
             rightPressed = true;
         }
-        if (code == KeyEvent.VK_ESCAPE) { // Toggle between play and pause states
+        if (code == KeyEvent.VK_ESCAPE) {
             if (gp.gameState == gp.playState) {
                 gp.setGameState(gp.pauseState);
             } else {
