@@ -1,20 +1,22 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    public static int gameState;
-    public static int playState = 1;
-    public static int pauseState = 2;
+    public int gameState;
+    public final int playState = 1;
+    public final int pauseState = 2;
     public Graphics2D g2;
     public int centerX = 250;
     public int centerY = 250;
     int FPS = 60;
     double rotationAngle = 0;
     Thread gameThread;
-    KeyHandler keyH = new KeyHandler();
+    KeyHandler keyH = new KeyHandler(this);
     Cursor cursor = new Cursor(this, keyH);
     Sound sound = new Sound();
+    public UI ui = new UI(this);
 
     GamePanel() {
         this.setPreferredSize(new Dimension(500, 500));
@@ -23,12 +25,12 @@ public class GamePanel extends JPanel implements Runnable {
         this.addKeyListener(keyH);
         this.setFocusable(true);
     }
-
     public void startGameThread() {
 
         gameThread = new Thread(this);
         gameThread.start();
         playMusic(0);
+        gameState = playState;
     }
 
     @Override
@@ -85,21 +87,39 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
-        cursor.update();
-        rotationAngle += 0.01;
+        if (gameState == playState){
+            cursor.update();
+            rotationAngle += 0.01;
+        }
+    }
+    public void setGameState(int newState) {
+        if (gameState != newState) {
+            gameState = newState;
+
+            if (gameState == playState) {
+                playMusic(0);
+            } else if (gameState == pauseState) {
+                stopMusic();
+            }
+        }
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g2 = (Graphics2D) g;
 
+        AffineTransform originalTransform = g2.getTransform();
+
         g2.translate(centerX, centerY);
         g2.rotate(rotationAngle);
         g2.translate(-centerX, -centerY);
 
-        centerHexagon();
+            centerHexagon();
+            cursor.draw(g2);
 
-        cursor.draw(g2);
+        g2.setTransform(originalTransform);
+
+        ui.draw(g2);
 
         g2.dispose();
     }
@@ -112,10 +132,5 @@ public class GamePanel extends JPanel implements Runnable {
     public void stopMusic(){
 
         sound.stop();
-    }
-    public void playSE(int i){
-
-        sound.setFile(i);
-        sound.play();
     }
 }

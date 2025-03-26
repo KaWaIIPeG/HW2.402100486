@@ -39,4 +39,7 @@ public class Sound {
             clip.stop();
         }
     }
+    public boolean isPlaying() {
+        return clip != null && clip.isRunning();
+    }
 }

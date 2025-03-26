@@ -3,8 +3,12 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
 
+    GamePanel gp;
     public boolean leftPressed, rightPressed;
 
+    public KeyHandler(GamePanel gp){
+        this.gp = gp;
+    }
     @Override
     public void keyTyped(KeyEvent e) {
     }
@@ -20,6 +24,14 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_D){
             rightPressed = true;
         }
+        if (code == KeyEvent.VK_ESCAPE) { // Toggle between play and pause states
+            if (gp.gameState == gp.playState) {
+                gp.setGameState(gp.pauseState);
+            } else {
+                gp.setGameState(gp.playState);
+            }
+        }
+
     }
 
     @Override
