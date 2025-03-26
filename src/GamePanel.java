@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class GamePanel extends JPanel implements Runnable{
+public class GamePanel extends JPanel implements Runnable {
 
     public static int gameState;
     public static int playState = 1;
@@ -10,27 +10,30 @@ public class GamePanel extends JPanel implements Runnable{
     public int centerX = 250;
     public int centerY = 250;
     int FPS = 60;
+    double rotationAngle = 0; // Rotation angle for the whole scene
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
-    Cursor cursor = new Cursor(this,keyH);
-    GamePanel(){
-        this.setPreferredSize(new Dimension(500,500));
+    Cursor cursor = new Cursor(this, keyH);
+
+    GamePanel() {
+        this.setPreferredSize(new Dimension(500, 500));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
     }
 
-    public void startGameThread(){
+    public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
     }
+
     @Override
     public void run() {
 
-        double drawInterval = 1_000_000_000/FPS;
+        double drawInterval = 1_000_000_000 / FPS;
         double nextDrawTime = System.nanoTime() + drawInterval;
-        while (gameThread != null){
+        while (gameThread != null) {
 
             update();
 
@@ -39,9 +42,9 @@ public class GamePanel extends JPanel implements Runnable{
             try {
 
                 double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime = remainingTime/1_000_000;
+                remainingTime = remainingTime / 1_000_000;
 
-                if (remainingTime < 0){
+                if (remainingTime < 0) {
                     remainingTime = 0;
                 }
 
@@ -54,9 +57,8 @@ public class GamePanel extends JPanel implements Runnable{
 
         }
     }
-    public void centerHexagon(){
 
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    public void centerHexagon() {
 
         int hexRadius = 60;
 
@@ -74,18 +76,24 @@ public class GamePanel extends JPanel implements Runnable{
             g2.drawLine(centerX, centerY, targetX, targetY);
         }
 
-        Polygon hexagon = new Polygon(xPoints,yPoints,6);
+        Polygon hexagon = new Polygon(xPoints, yPoints, 6);
         g2.setPaint(Color.MAGENTA);
         g2.fillPolygon(hexagon);
     }
 
-    public void update(){
+    public void update() {
         cursor.update();
+        rotationAngle += 0.01; // Increment the rotation angle
     }
 
-    public void paintComponent(Graphics g){
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g2 = (Graphics2D) g;
+
+        // Apply global rotation
+        g2.translate(centerX, centerY);
+        g2.rotate(rotationAngle);
+        g2.translate(-centerX, -centerY);
 
         centerHexagon();
 
