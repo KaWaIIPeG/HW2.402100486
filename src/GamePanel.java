@@ -10,10 +10,11 @@ public class GamePanel extends JPanel implements Runnable {
     public int centerX = 250;
     public int centerY = 250;
     int FPS = 60;
-    double rotationAngle = 0; // Rotation angle for the whole scene
+    double rotationAngle = 0;
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
     Cursor cursor = new Cursor(this, keyH);
+    Sound sound = new Sound();
 
     GamePanel() {
         this.setPreferredSize(new Dimension(500, 500));
@@ -24,8 +25,10 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void startGameThread() {
+
         gameThread = new Thread(this);
         gameThread.start();
+        playMusic(0);
     }
 
     @Override
@@ -83,14 +86,13 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         cursor.update();
-        rotationAngle += 0.01; // Increment the rotation angle
+        rotationAngle += 0.01;
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g2 = (Graphics2D) g;
 
-        // Apply global rotation
         g2.translate(centerX, centerY);
         g2.rotate(rotationAngle);
         g2.translate(-centerX, -centerY);
@@ -100,5 +102,20 @@ public class GamePanel extends JPanel implements Runnable {
         cursor.draw(g2);
 
         g2.dispose();
+    }
+    public void playMusic(int i){
+
+        sound.setFile(i);
+        sound.play();
+        sound.loop();
+    }
+    public void stopMusic(){
+
+        sound.stop();
+    }
+    public void playSE(int i){
+
+        sound.setFile(i);
+        sound.play();
     }
 }
