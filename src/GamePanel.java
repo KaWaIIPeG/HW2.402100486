@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -18,36 +20,33 @@ public class GamePanel extends JPanel implements Runnable {
     Cursor cursor = new Cursor(this, keyH);
     Sound sound = new Sound();
     public UI ui = new UI(this);
+    List<Wall> walls = new ArrayList<>();
+    int wallSpawnTimer = 0;
 
     GamePanel() {
-
         this.setPreferredSize(new Dimension(500, 500));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
     }
-    public void startGameThread() {
 
+    public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
-        //playMusic(0);
         gameState = titleState;
     }
 
     @Override
     public void run() {
-
         double drawInterval = 1_000_000_000 / FPS;
         double nextDrawTime = System.nanoTime() + drawInterval;
+
         while (gameThread != null) {
-
             update();
-
             repaint();
 
             try {
-
                 double remainingTime = nextDrawTime - System.nanoTime();
                 remainingTime = remainingTime / 1_000_000;
 
@@ -61,12 +60,21 @@ public class GamePanel extends JPanel implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 
-    public void centerHexagon() {
+    private void spawnWalls() {
+        wallSpawnTimer++;
+        if (wallSpawnTimer > 100) {
+            int sliceIndex = (int) (Math.random() * 6); // Randomly select a slice (0 to 5)
+            walls.add(new Wall(sliceIndex, 500, 2));   // Create a wall in the selected slice
+            wallSpawnTimer = 0;
+        }
+    }
 
+
+
+    public void centerHexagon() {
         int hexRadius = 60;
 
         int[] xPoints = new int[6];
@@ -76,27 +84,39 @@ public class GamePanel extends JPanel implements Runnable {
             yPoints[i] = (int) (centerY + hexRadius * Math.sin(Math.toRadians(60 * i)));
         }
 
-        g2.setPaint(Color.red);
+        g2.setPaint(Color.RED);
         for (int i = 0; i < 6; i++) {
             int targetX = (int) (centerX + 500 * Math.cos(Math.toRadians(60 * i)));
             int targetY = (int) (centerY + 500 * Math.sin(Math.toRadians(60 * i)));
             g2.drawLine(centerX, centerY, targetX, targetY);
         }
 
-        Polygon hexagon = new Polygon(xPoints, yPoints, 6);
         g2.setPaint(Color.RED);
+        Polygon hexagon = new Polygon(xPoints, yPoints, 6);
         g2.fillPolygon(hexagon);
     }
 
     public void update() {
-
-        if (gameState == playState){
+        if (gameState == playState) {
             cursor.update();
             rotationAngle += 0.01;
+
+            spawnWalls();
+            for (int i = 0; i < walls.size(); i++) {
+                Wall wall = walls.get(i);
+                wall.update(rotationAngle);
+
+                if (wall.distance <= 0) {
+                    walls.remove(i);
+                    i--;
+                } else if (wall.checkCollision(cursor.angle, cursor.cursorRadius)) {
+                    System.out.println("Collision detected!");
+                }
+            }
         }
     }
-    public void setGameState(int newState) {
 
+    public void setGameState(int newState) {
         if (gameState != newState) {
             gameState = newState;
 
@@ -108,44 +128,48 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g2 = (Graphics2D) g;
 
-        if (gameState == titleState){
-
+        if (gameState == titleState) {
             ui.draw(g2);
-        }
-        else {
-
+        } else {
             AffineTransform originalTransform = g2.getTransform();
 
             g2.translate(centerX, centerY);
-            g2.rotate(rotationAngle);
+            g2.rotate(rotationAngle); // Rotate hexagon and walls
             g2.translate(-centerX, -centerY);
 
+            // Draw walls within their slices
+            for (Wall wall : walls) {
+                wall.draw(g2, centerX, centerY);
+            }
+
             centerHexagon();
-            cursor.draw(g2);
 
             g2.setTransform(originalTransform);
-
+            cursor.draw(g2);
             ui.draw(g2);
 
             g2.dispose();
         }
     }
-    public void playMusic(int i){
 
+
+
+    public void playMusic(int i) {
         sound.setFile(i);
         sound.play();
         sound.loop();
     }
-    public void stopMusic(){
 
+    public void stopMusic() {
         sound.stop();
     }
-    public void pauseMusic(){
 
+    public void pauseMusic() {
         sound.pause();
     }
 }
