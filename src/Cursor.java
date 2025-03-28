@@ -5,7 +5,7 @@ public class Cursor {
     KeyHandler keyH;
     int cursorRadius = 70;
     public double angle = 0;
-    public double Speed = 0.1;
+    public double Speed = 0.07;
     int baseSize = 10;
     int height = 10;
     Cursor(GamePanel gp , KeyHandler keyH){
@@ -27,7 +27,7 @@ public class Cursor {
                 centerY + height / 2,
                 centerY + height / 2
         };
-        g2.setColor(Color.WHITE);
+        g2.setColor(Color.GREEN);
         g2.fillPolygon(xPoints, yPoints, 3);
     }
     public void update(){

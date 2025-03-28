@@ -66,8 +66,8 @@ public class GamePanel extends JPanel implements Runnable {
     private void spawnWalls() {
         wallSpawnTimer++;
         if (wallSpawnTimer > 100) {
-            int sliceIndex = (int) (Math.random() * 6); // Randomly select a slice (0 to 5)
-            walls.add(new Wall(sliceIndex, 500, 2));   // Create a wall in the selected slice
+            int emptySliceIndex = (int) (Math.random() * 6);
+            walls.add(new Wall(500, 2, emptySliceIndex));
             wallSpawnTimer = 0;
         }
     }
@@ -139,18 +139,17 @@ public class GamePanel extends JPanel implements Runnable {
             AffineTransform originalTransform = g2.getTransform();
 
             g2.translate(centerX, centerY);
-            g2.rotate(rotationAngle); // Rotate hexagon and walls
+            g2.rotate(rotationAngle);
             g2.translate(-centerX, -centerY);
 
-            // Draw walls within their slices
             for (Wall wall : walls) {
                 wall.draw(g2, centerX, centerY);
             }
 
             centerHexagon();
+            cursor.draw(g2);
 
             g2.setTransform(originalTransform);
-            cursor.draw(g2);
             ui.draw(g2);
 
             g2.dispose();
