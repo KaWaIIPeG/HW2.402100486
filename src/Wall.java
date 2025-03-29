@@ -6,6 +6,7 @@ public class Wall {
     double distance;
     double speed;
     int thickness = 50;
+    int patternNum = 0;
     List<Integer> wallSlices;
 
     public Wall(double distance, double speed, int emptySliceIndex) {
@@ -15,6 +16,40 @@ public class Wall {
         wallSlices = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             if (i != emptySliceIndex) {
+                wallSlices.add(i);
+            }
+        }
+    }
+    public Wall(double distance, double speed, int emptySliceIndex1, int emptySliceIndex2, int emptySliceIndex3) {
+        this.distance = distance;
+        this.speed = speed;
+
+        if (emptySliceIndex2 >= 6) {
+            emptySliceIndex2 -= 6;
+        }
+        if (emptySliceIndex3 >= 6) {
+            emptySliceIndex3 -= 6;
+        }
+
+        wallSlices = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            if (i != emptySliceIndex1 && i != emptySliceIndex2 && i != emptySliceIndex3) {
+                wallSlices.add(i);
+            }
+        }
+    }
+
+    public Wall(double distance, double speed, int emptySliceIndex1, int emptySliceIndex2) {
+        this.distance = distance;
+        this.speed = speed;
+
+        if (emptySliceIndex2 >= 6) {
+            emptySliceIndex2 -= 6;
+        }
+
+        wallSlices = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            if (i != emptySliceIndex1 && i != emptySliceIndex2) {
                 wallSlices.add(i);
             }
         }
@@ -54,8 +89,8 @@ public class Wall {
 
     public boolean checkCollision(double playerAngle, int playerRadius) {
         for (int sliceIndex : wallSlices) {
-            double startAngle = sliceIndex * Math.PI / 3 + Math.PI / 12;
-            double endAngle = startAngle + Math.PI / 3 - Math.PI / 12;
+            double startAngle = sliceIndex * Math.PI / 3;
+            double endAngle = startAngle + Math.PI / 3;
 
             if (distance <= playerRadius + 10 && distance >= playerRadius - 10 &&
                     playerAngle >= startAngle && playerAngle <= endAngle) {

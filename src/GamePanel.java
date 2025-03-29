@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -65,9 +66,27 @@ public class GamePanel extends JPanel implements Runnable {
 
     private void spawnWalls() {
         wallSpawnTimer++;
+
         if (wallSpawnTimer > 100) {
-            int emptySliceIndex = (int) (Math.random() * 6);
-            walls.add(new Wall(500, 2, emptySliceIndex));
+            int thePattern = (int) (Math.random() * 4);
+
+            if (thePattern == 0 || thePattern == 1) {
+                int emptySliceIndex = (int) (Math.random() * 6);
+                walls.add(new Wall(500, 2, emptySliceIndex));
+            }
+            else if (thePattern == 2) {
+
+                int emptySliceIndex1 = (int) (Math.random() * 6);
+                int emptySliceIndex2 = (emptySliceIndex1 + 2) % 6;
+                int emptySliceIndex3 = (emptySliceIndex1 + 4) % 6;
+                walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2, emptySliceIndex3));
+            }
+            else if (thePattern == 3) {
+
+                int emptySliceIndex1 = (int) (Math.random() * 6);
+                int emptySliceIndex2 = (emptySliceIndex1 + 3) % 6;
+                walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2));
+            }
             wallSpawnTimer = 0;
         }
     }
