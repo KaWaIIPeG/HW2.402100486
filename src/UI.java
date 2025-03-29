@@ -4,11 +4,18 @@ public class UI {
     Font font;
     GamePanel gp;
     Graphics2D g2;
+    public boolean messageOn = false;
+    public String message = "";
+    double playTime;
     public int commandNum = 0;
     public UI(GamePanel gp){
 
         this.gp = gp;
         font = new Font("Arial", Font.BOLD, 36);
+    }
+    public void showMessage(String text){
+        message = text;
+        messageOn = true;
     }
     public void draw(Graphics2D g2){
 
@@ -25,8 +32,10 @@ public class UI {
         if (gp.gameState == gp.pauseState) {
             drawPauseScreen(g2);
         }
+        if (gp.gameState == gp.gameOverState){
+            drawEndScreen();
+        }
     }
-
     private void drawTitleScreen() {
 
         g2.setFont(g2.getFont().deriveFont(Font.ITALIC,50));
@@ -79,11 +88,16 @@ public class UI {
     }
 
     private void drawPauseScreen(Graphics2D g2) {
+        centerMessage("Paused",Color.YELLOW);
+    }
+    private void drawEndScreen() {
+        centerMessage("Game Over",Color.RED);
+    }
 
-        String text = "PAUSED";
+    private void centerMessage(String text,Color color){
         Font font = new Font("Arial", Font.BOLD, 36);
         g2.setFont(font);
-        g2.setPaint(Color.YELLOW);
+        g2.setPaint(color);
 
         FontMetrics fm = g2.getFontMetrics();
         int textWidth = fm.stringWidth(text);

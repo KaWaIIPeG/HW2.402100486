@@ -54,7 +54,6 @@ public class Wall {
             }
         }
     }
-
     public Wall(double distance, double speed, int emptySliceIndex1, int emptySliceIndex2) {
         this.distance = distance;
         this.speed = speed;
@@ -68,6 +67,32 @@ public class Wall {
             if (i != emptySliceIndex1 && i != emptySliceIndex2) {
                 wallSlices.add(i);
             }
+        }
+    }
+    public void spawnWalls() {
+        wallSpawnTimer++;
+
+        if (wallSpawnTimer > 100) {
+            int thePattern = (int) (Math.random() * 4);
+
+            if (thePattern == 0 || thePattern == 1) {
+                int emptySliceIndex = (int) (Math.random() * 6);
+                gp.walls.add(new Wall(500, 2, emptySliceIndex));
+            }
+            else if (thePattern == 2) {
+
+                int emptySliceIndex1 = (int) (Math.random() * 6);
+                int emptySliceIndex2 = (emptySliceIndex1 + 2) % 6;
+                int emptySliceIndex3 = (emptySliceIndex1 + 4) % 6;
+                gp.walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2, emptySliceIndex3));
+            }
+            else if (thePattern == 3) {
+
+                int emptySliceIndex1 = (int) (Math.random() * 6);
+                int emptySliceIndex2 = (emptySliceIndex1 + 3) % 6;
+                gp.walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2));
+            }
+            wallSpawnTimer = 0;
         }
     }
 
@@ -125,32 +150,5 @@ public class Wall {
         y1End = (int) (centerY + (distance + thickness) * Math.sin(startAngle));
         x2End = (int) (centerX + (distance + thickness) * Math.cos(endAngle));
         y2End = (int) (centerY + (distance + thickness) * Math.sin(endAngle));
-    }
-
-    public void spawnWalls() {
-        wallSpawnTimer++;
-
-        if (wallSpawnTimer > 100) {
-            int thePattern = (int) (Math.random() * 4);
-
-            if (thePattern == 0 || thePattern == 1) {
-                int emptySliceIndex = (int) (Math.random() * 6);
-                gp.walls.add(new Wall(500, 2, emptySliceIndex));
-            }
-            else if (thePattern == 2) {
-
-                int emptySliceIndex1 = (int) (Math.random() * 6);
-                int emptySliceIndex2 = (emptySliceIndex1 + 2) % 6;
-                int emptySliceIndex3 = (emptySliceIndex1 + 4) % 6;
-                gp.walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2, emptySliceIndex3));
-            }
-            else if (thePattern == 3) {
-
-                int emptySliceIndex1 = (int) (Math.random() * 6);
-                int emptySliceIndex2 = (emptySliceIndex1 + 3) % 6;
-                gp.walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2));
-            }
-            wallSpawnTimer = 0;
-        }
     }
 }

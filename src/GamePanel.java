@@ -10,10 +10,12 @@ public class GamePanel extends JPanel implements Runnable {
     public final int titleState = 0;
     public final int playState = 1;
     public final int pauseState = 2;
+    public final int gameOverState = 3;
     public Graphics2D g2;
     public int centerX = 250;
     public int centerY = 250;
     int FPS = 60;
+    int counter = 0;
     double rotationAngle = 0;
     Thread gameThread;
     KeyHandler keyH = new KeyHandler(this);
@@ -21,7 +23,6 @@ public class GamePanel extends JPanel implements Runnable {
     Sound sound = new Sound();
     public UI ui = new UI(this);
     public Wall w = new Wall(this);
-
     List<Wall> walls = new ArrayList<>();
 
     GamePanel() {
@@ -81,6 +82,14 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
             handleCollision();
+
+        } else if (gameState == gameOverState) {
+            counter++;
+            if (counter > 120) {
+                gameState = titleState;
+                w.wallSpawnTimer = 0;
+                counter = 0;
+            }
         }
     }
     @Override
@@ -90,6 +99,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (gameState == titleState) {
             ui.draw(g2);
+
+        } else if (gameState == gameOverState) {
+            ui.draw(g2);
+
         } else {
             AffineTransform originalTransform = g2.getTransform();
 
@@ -106,9 +119,28 @@ public class GamePanel extends JPanel implements Runnable {
 
             g2.setTransform(originalTransform);
             ui.draw(g2);
-
-            g2.dispose();
         }
+        g2.dispose();
+    }
+    public void handleCollision() {
+        Polygon cursorPolygon = cursor.getBoundingPolygon();
+
+        for (Wall wall : walls) {
+            if (wall.checkCollision(cursorPolygon)) {
+                if (gameState != gameOverState) {
+                    sound.stop();
+                    gameState = gameOverState;
+                    walls.clear();
+                    counter = 0;
+                }
+                break;
+            }
+        }
+    }
+    public void playMusic(int i) {
+        sound.setFile(i);
+        sound.play();
+        sound.loop();
     }
     public void setGameState(int newState) {
         if (gameState != newState) {
@@ -120,28 +152,5 @@ public class GamePanel extends JPanel implements Runnable {
                 sound.pause();
             }
         }
-    }
-    public void handleCollision() {
-        Polygon cursorPolygon = cursor.getBoundingPolygon();
-
-        for (Wall wall : walls) {
-
-            if (wall.checkCollision(cursorPolygon)) {
-
-                System.out.println("Collision detected!");
-                walls.clear();
-                gameState = titleState;
-                w.wallSpawnTimer = 0;
-                sound.stop();
-
-                break;
-            }
-        }
-    }
-    public void playMusic(int i) {
-        sound.stop();
-        sound.setFile(i);
-        sound.play();
-        sound.loop();
     }
 }
