@@ -8,7 +8,22 @@ public class Wall {
     int thickness = 50;
     public int centerX = 250;
     public int centerY = 250;
+    int wallSpawnTimer = 0;
+    GamePanel gp;
+    int x1Start;
+    int y1Start;
+    int x2Start;
+    int y2Start;
+
+    int x1End;
+    int y1End;
+    int x2End;
+    int y2End;
     List<Integer> wallSlices;
+
+    public Wall(GamePanel gp){
+        this.gp = gp;
+    }
 
     public Wall(double distance, double speed, int emptySliceIndex) {
         this.distance = distance;
@@ -63,19 +78,9 @@ public class Wall {
     public void draw(Graphics2D g2, int centerX, int centerY) {
         g2.setColor(Color.WHITE);
 
-        for (int sliceIndex : wallSlices) {
-            double startAngle = sliceIndex * Math.PI / 3;
-            double endAngle = startAngle + Math.PI / 3;
+            for (int sliceIndex : wallSlices) {
 
-            int x1Start = (int) (centerX + distance * Math.cos(startAngle));
-            int y1Start = (int) (centerY + distance * Math.sin(startAngle));
-            int x2Start = (int) (centerX + distance * Math.cos(endAngle));
-            int y2Start = (int) (centerY + distance * Math.sin(endAngle));
-
-            int x1End = (int) (centerX + (distance + thickness) * Math.cos(startAngle));
-            int y1End = (int) (centerY + (distance + thickness) * Math.sin(startAngle));
-            int x2End = (int) (centerX + (distance + thickness) * Math.cos(endAngle));
-            int y2End = (int) (centerY + (distance + thickness) * Math.sin(endAngle));
+            polygonNum(centerX,centerY,sliceIndex);
 
             Polygon wallPolygon = new Polygon(
                     new int[]{x1Start, x2Start, x2End, x1End},
@@ -98,18 +103,8 @@ public class Wall {
         return false;
     }
     public Polygon getWallPolygon(int sliceIndex) {
-        double startAngle = sliceIndex * Math.PI / 3;
-        double endAngle = startAngle + Math.PI / 3;
 
-        int x1Start = (int) (centerX + distance * Math.cos(startAngle));
-        int y1Start = (int) (centerY + distance * Math.sin(startAngle));
-        int x2Start = (int) (centerX + distance * Math.cos(endAngle));
-        int y2Start = (int) (centerY + distance * Math.sin(endAngle));
-
-        int x1End = (int) (centerX + (distance + thickness) * Math.cos(startAngle));
-        int y1End = (int) (centerY + (distance + thickness) * Math.sin(startAngle));
-        int x2End = (int) (centerX + (distance + thickness) * Math.cos(endAngle));
-        int y2End = (int) (centerY + (distance + thickness) * Math.sin(endAngle));
+        polygonNum(this.centerX,this.centerY,sliceIndex);
 
         return new Polygon(
                 new int[]{x1Start, x2Start, x2End, x1End},
@@ -117,5 +112,45 @@ public class Wall {
                 4
         );
     }
+    public void polygonNum(int centerX, int centerY,int sliceIndex){
+        double startAngle = sliceIndex * Math.PI / 3;
+        double endAngle = startAngle + Math.PI / 3;
 
+        x1Start = (int) (centerX + distance * Math.cos(startAngle));
+        y1Start = (int) (centerY + distance * Math.sin(startAngle));
+        x2Start = (int) (centerX + distance * Math.cos(endAngle));
+        y2Start = (int) (centerY + distance * Math.sin(endAngle));
+
+        x1End = (int) (centerX + (distance + thickness) * Math.cos(startAngle));
+        y1End = (int) (centerY + (distance + thickness) * Math.sin(startAngle));
+        x2End = (int) (centerX + (distance + thickness) * Math.cos(endAngle));
+        y2End = (int) (centerY + (distance + thickness) * Math.sin(endAngle));
+    }
+
+    public void spawnWalls() {
+        wallSpawnTimer++;
+
+        if (wallSpawnTimer > 100) {
+            int thePattern = (int) (Math.random() * 4);
+
+            if (thePattern == 0 || thePattern == 1) {
+                int emptySliceIndex = (int) (Math.random() * 6);
+                gp.walls.add(new Wall(500, 2, emptySliceIndex));
+            }
+            else if (thePattern == 2) {
+
+                int emptySliceIndex1 = (int) (Math.random() * 6);
+                int emptySliceIndex2 = (emptySliceIndex1 + 2) % 6;
+                int emptySliceIndex3 = (emptySliceIndex1 + 4) % 6;
+                gp.walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2, emptySliceIndex3));
+            }
+            else if (thePattern == 3) {
+
+                int emptySliceIndex1 = (int) (Math.random() * 6);
+                int emptySliceIndex2 = (emptySliceIndex1 + 3) % 6;
+                gp.walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2));
+            }
+            wallSpawnTimer = 0;
+        }
+    }
 }

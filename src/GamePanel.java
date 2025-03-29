@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -21,8 +20,9 @@ public class GamePanel extends JPanel implements Runnable {
     Cursor cursor = new Cursor(this, keyH);
     Sound sound = new Sound();
     public UI ui = new UI(this);
+    public Wall w = new Wall(this);
+
     List<Wall> walls = new ArrayList<>();
-    int wallSpawnTimer = 0;
 
     GamePanel() {
         this.setPreferredSize(new Dimension(500, 500));
@@ -64,63 +64,12 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private void spawnWalls() {
-        wallSpawnTimer++;
-
-        if (wallSpawnTimer > 100) {
-            int thePattern = (int) (Math.random() * 4);
-
-            if (thePattern == 0 || thePattern == 1) {
-                int emptySliceIndex = (int) (Math.random() * 6);
-                walls.add(new Wall(500, 2, emptySliceIndex));
-            }
-            else if (thePattern == 2) {
-
-                int emptySliceIndex1 = (int) (Math.random() * 6);
-                int emptySliceIndex2 = (emptySliceIndex1 + 2) % 6;
-                int emptySliceIndex3 = (emptySliceIndex1 + 4) % 6;
-                walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2, emptySliceIndex3));
-            }
-            else if (thePattern == 3) {
-
-                int emptySliceIndex1 = (int) (Math.random() * 6);
-                int emptySliceIndex2 = (emptySliceIndex1 + 3) % 6;
-                walls.add(new Wall(500, 2, emptySliceIndex1, emptySliceIndex2));
-            }
-            wallSpawnTimer = 0;
-        }
-    }
-
-
-
-    public void centerHexagon() {
-        int hexRadius = 60;
-
-        int[] xPoints = new int[6];
-        int[] yPoints = new int[6];
-        for (int i = 0; i < 6; i++) {
-            xPoints[i] = (int) (centerX + hexRadius * Math.cos(Math.toRadians(60 * i)));
-            yPoints[i] = (int) (centerY + hexRadius * Math.sin(Math.toRadians(60 * i)));
-        }
-
-        g2.setPaint(Color.RED);
-        for (int i = 0; i < 6; i++) {
-            int targetX = (int) (centerX + 500 * Math.cos(Math.toRadians(60 * i)));
-            int targetY = (int) (centerY + 500 * Math.sin(Math.toRadians(60 * i)));
-            g2.drawLine(centerX, centerY, targetX, targetY);
-        }
-
-        g2.setPaint(Color.RED);
-        Polygon hexagon = new Polygon(xPoints, yPoints, 6);
-        g2.fillPolygon(hexagon);
-    }
-
     public void update() {
         if (gameState == playState) {
             cursor.update();
             rotationAngle += 0.01;
 
-            spawnWalls();
+            w.spawnWalls();
 
             for (int i = 0; i < walls.size(); i++) {
                 Wall wall = walls.get(i);
@@ -134,37 +83,6 @@ public class GamePanel extends JPanel implements Runnable {
             handleCollision();
         }
     }
-
-    public void handleCollision() {
-        Polygon cursorPolygon = cursor.getBoundingPolygon();
-
-        for (Wall wall : walls) {
-
-            if (wall.checkCollision(cursorPolygon)) {
-
-                System.out.println("Collision detected!");
-                walls.clear();
-                gameState = titleState;
-                wallSpawnTimer = 0;
-                stopMusic();
-
-                break;
-            }
-        }
-    }
-
-    public void setGameState(int newState) {
-        if (gameState != newState) {
-            gameState = newState;
-
-            if (gameState == playState) {
-                playMusic(0);
-            } else if (gameState == pauseState) {
-                pauseMusic();
-            }
-        }
-    }
-
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -183,7 +101,7 @@ public class GamePanel extends JPanel implements Runnable {
                 wall.draw(g2, centerX, centerY);
             }
 
-            centerHexagon();
+            new CenterHexagon(this);
             cursor.draw(g2);
 
             g2.setTransform(originalTransform);
@@ -192,21 +110,38 @@ public class GamePanel extends JPanel implements Runnable {
             g2.dispose();
         }
     }
+    public void setGameState(int newState) {
+        if (gameState != newState) {
+            gameState = newState;
 
+            if (gameState == playState) {
+                playMusic(0);
+            } else if (gameState == pauseState) {
+                sound.pause();
+            }
+        }
+    }
+    public void handleCollision() {
+        Polygon cursorPolygon = cursor.getBoundingPolygon();
 
+        for (Wall wall : walls) {
 
+            if (wall.checkCollision(cursorPolygon)) {
+
+                System.out.println("Collision detected!");
+                walls.clear();
+                gameState = titleState;
+                w.wallSpawnTimer = 0;
+                sound.stop();
+
+                break;
+            }
+        }
+    }
     public void playMusic(int i) {
-        stopMusic();
+        sound.stop();
         sound.setFile(i);
         sound.play();
         sound.loop();
-    }
-
-    public void stopMusic() {
-        sound.stop();
-    }
-
-    public void pauseMusic() {
-        sound.pause();
     }
 }
