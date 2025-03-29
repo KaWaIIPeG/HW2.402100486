@@ -4,18 +4,11 @@ public class UI {
     Font font;
     GamePanel gp;
     Graphics2D g2;
-    public boolean messageOn = false;
-    public String message = "";
     public int commandNum = 0;
     public UI(GamePanel gp){
 
         this.gp = gp;
         font = new Font("Arial", Font.BOLD, 36);
-    }
-    public void showMessage(String text){
-
-        message = text;
-        messageOn = true;
     }
     public void draw(Graphics2D g2){
 

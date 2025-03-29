@@ -14,7 +14,7 @@ public class Cursor {
     }
     public void draw(Graphics2D g2) {
 
-        int centerX = (int) (gp.centerX + cursorRadius * Math.cos(angle)) + 1;
+        int centerX = (int) (gp.centerX + cursorRadius * Math.cos(angle));
         int centerY = (int) (gp.centerY + cursorRadius * Math.sin(angle));
 
         int[] xPoints = {
@@ -37,5 +37,23 @@ public class Cursor {
         else if (keyH.rightPressed){
             angle += Speed;
         }
+    }
+
+    public Polygon getBoundingPolygon() {
+        int centerX = (int) (gp.centerX + cursorRadius * Math.cos(angle));
+        int centerY = (int) (gp.centerY + cursorRadius * Math.sin(angle));
+
+        int[] xPoints = {
+                centerX,
+                centerX - baseSize / 2,
+                centerX + baseSize / 2
+        };
+        int[] yPoints = {
+                centerY - height / 2,
+                centerY + height / 2,
+                centerY + height / 2
+        };
+
+        return new Polygon(xPoints, yPoints, 3);
     }
 }

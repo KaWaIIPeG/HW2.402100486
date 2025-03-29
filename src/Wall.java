@@ -6,7 +6,8 @@ public class Wall {
     double distance;
     double speed;
     int thickness = 50;
-    int patternNum = 0;
+    public int centerX = 250;
+    public int centerY = 250;
     List<Integer> wallSlices;
 
     public Wall(double distance, double speed, int emptySliceIndex) {
@@ -62,7 +63,6 @@ public class Wall {
     public void draw(Graphics2D g2, int centerX, int centerY) {
         g2.setColor(Color.WHITE);
 
-        // Draw walls in specified slices
         for (int sliceIndex : wallSlices) {
             double startAngle = sliceIndex * Math.PI / 3;
             double endAngle = startAngle + Math.PI / 3;
@@ -87,16 +87,35 @@ public class Wall {
         }
     }
 
-    public boolean checkCollision(double playerAngle, int playerRadius) {
+    public boolean checkCollision(Polygon cursorPolygon) {
         for (int sliceIndex : wallSlices) {
-            double startAngle = sliceIndex * Math.PI / 3;
-            double endAngle = startAngle + Math.PI / 3;
+            Polygon wallPolygon = getWallPolygon(sliceIndex);
 
-            if (distance <= playerRadius + 10 && distance >= playerRadius - 10 &&
-                    playerAngle >= startAngle && playerAngle <= endAngle) {
+            if (wallPolygon.intersects(cursorPolygon.getBounds2D())) {
                 return true;
             }
         }
         return false;
     }
+    public Polygon getWallPolygon(int sliceIndex) {
+        double startAngle = sliceIndex * Math.PI / 3;
+        double endAngle = startAngle + Math.PI / 3;
+
+        int x1Start = (int) (centerX + distance * Math.cos(startAngle));
+        int y1Start = (int) (centerY + distance * Math.sin(startAngle));
+        int x2Start = (int) (centerX + distance * Math.cos(endAngle));
+        int y2Start = (int) (centerY + distance * Math.sin(endAngle));
+
+        int x1End = (int) (centerX + (distance + thickness) * Math.cos(startAngle));
+        int y1End = (int) (centerY + (distance + thickness) * Math.sin(startAngle));
+        int x2End = (int) (centerX + (distance + thickness) * Math.cos(endAngle));
+        int y2End = (int) (centerY + (distance + thickness) * Math.sin(endAngle));
+
+        return new Polygon(
+                new int[]{x1Start, x2Start, x2End, x1End},
+                new int[]{y1Start, y2Start, y2End, y1End},
+                4
+        );
+    }
+
 }

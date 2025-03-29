@@ -121,6 +121,7 @@ public class GamePanel extends JPanel implements Runnable {
             rotationAngle += 0.01;
 
             spawnWalls();
+
             for (int i = 0; i < walls.size(); i++) {
                 Wall wall = walls.get(i);
                 wall.update(rotationAngle);
@@ -128,9 +129,26 @@ public class GamePanel extends JPanel implements Runnable {
                 if (wall.distance <= 0) {
                     walls.remove(i);
                     i--;
-                } else if (wall.checkCollision(cursor.angle, cursor.cursorRadius)) {
-                    System.out.println("Collision detected!");
                 }
+            }
+            handleCollision();
+        }
+    }
+
+    public void handleCollision() {
+        Polygon cursorPolygon = cursor.getBoundingPolygon();
+
+        for (Wall wall : walls) {
+
+            if (wall.checkCollision(cursorPolygon)) {
+
+                System.out.println("Collision detected!");
+                walls.clear();
+                gameState = titleState;
+                wallSpawnTimer = 0;
+                stopMusic();
+
+                break;
             }
         }
     }
@@ -178,6 +196,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     public void playMusic(int i) {
+        stopMusic();
         sound.setFile(i);
         sound.play();
         sound.loop();
