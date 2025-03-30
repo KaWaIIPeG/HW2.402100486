@@ -5,7 +5,7 @@ public class Cursor {
     KeyHandler keyH;
     int cursorRadius = 70;
     public double angle = 0;
-    public double Speed = 0.07;
+    public double speed = 0.07;
     int baseSize = 10;
     int height = 10;
     int[] xPoints;
@@ -17,15 +17,16 @@ public class Cursor {
     public void draw(Graphics2D g2) {
 
         cursorNum();
-        g2.setColor(Color.GREEN);
+        g2.setColor(new Color(232, 26, 107));
         g2.fillPolygon(xPoints, yPoints, 3);
     }
-    public void update(){
+    public void update(double speed){
+        this.speed = speed;
         if (keyH.leftPressed){
-            angle -= Speed;
+            angle -= speed;
         }
         else if (keyH.rightPressed){
-            angle += Speed;
+            angle += speed;
         }
     }
 

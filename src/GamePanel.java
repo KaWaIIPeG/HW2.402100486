@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -16,7 +17,8 @@ public class GamePanel extends JPanel implements Runnable {
     public int centerY = 250;
     int FPS = 60;
     int counter = 0;
-    double rotationAngle = 0;
+    double rotationAngle = 0.01;
+    public int speedCounter = 0;
     Thread gameThread;
     KeyHandler keyH = new KeyHandler(this);
     Cursor cursor = new Cursor(this, keyH);
@@ -67,10 +69,22 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         if (gameState == playState) {
-            cursor.update();
-            rotationAngle += 0.01;
+            cursor.update(0.05 + (speedCounter / 60) * 0.00045);
 
-            w.spawnWalls();
+            rotationAngle += 0.01 + (speedCounter / 60) * 0.0004;
+            speedCounter++;
+
+            if (speedCounter % 60 == 0) {
+                for (Wall wall : walls) {
+                    wall.speed += 0.07;
+                }
+            }
+
+            w.spawnWalls(2 + (speedCounter / 60) * 0.07);
+
+            if (speedCounter > 3600) {
+                speedCounter = 3600;
+            }
 
             for (int i = 0; i < walls.size(); i++) {
                 Wall wall = walls.get(i);
@@ -81,6 +95,7 @@ public class GamePanel extends JPanel implements Runnable {
                     i--;
                 }
             }
+
             handleCollision();
 
         } else if (gameState == gameOverState) {
@@ -88,6 +103,9 @@ public class GamePanel extends JPanel implements Runnable {
             if (counter > 120) {
                 gameState = titleState;
                 w.wallSpawnTimer = 0;
+                rotationAngle = 0.01;
+                ui.playTime = 0;
+                speedCounter = 0;
                 counter = 0;
             }
         }
@@ -122,6 +140,26 @@ public class GamePanel extends JPanel implements Runnable {
         }
         g2.dispose();
     }
+
+    public static Color getRandomColor() {
+
+        List<Color> colors = new ArrayList<>();
+        colors.add(new Color(77,137,99));
+        colors.add(new Color(225,179,120));
+        colors.add(new Color(224,204,151));
+        colors.add(new Color(236,121,154));
+        colors.add(new Color(238,50,51));
+        colors.add(new Color(168,74,92));
+        colors.add(new Color(255,106,0));
+        colors.add(new Color(94,119,3));
+        colors.add(new Color(135, 206, 250));
+        colors.add(new Color(255, 105, 180));
+        colors.add(new Color(152, 80, 60));
+
+        Random random = new Random();
+        return colors.get(random.nextInt(colors.size()));
+    }
+
     public void handleCollision() {
         Polygon cursorPolygon = cursor.getBoundingPolygon();
 
@@ -147,7 +185,7 @@ public class GamePanel extends JPanel implements Runnable {
             gameState = newState;
 
             if (gameState == playState) {
-                playMusic(0);
+//                playMusic(0);
             } else if (gameState == pauseState) {
                 sound.pause();
             }

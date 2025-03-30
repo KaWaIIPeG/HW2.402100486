@@ -1,36 +1,34 @@
 import java.awt.*;
+import java.text.DecimalFormat;
 
 public class UI {
     Font font;
     GamePanel gp;
     Graphics2D g2;
-    public boolean messageOn = false;
-    public String message = "";
     double playTime;
+    DecimalFormat dFormat = new DecimalFormat("#0.00");
+    public double lastPlayTime = 0;
     public int commandNum = 0;
     public UI(GamePanel gp){
 
         this.gp = gp;
         font = new Font("Arial", Font.BOLD, 36);
     }
-    public void showMessage(String text){
-        message = text;
-        messageOn = true;
-    }
     public void draw(Graphics2D g2){
 
         this.g2 = g2;
         g2.setFont(font);
-        g2.setColor(Color.GREEN);
 
         if (gp.gameState == gp.titleState){
             drawTitleScreen();
         }
         if (gp.gameState == gp.playState){
-
+            playTime += (double)1/60;
+            g2.setColor(Color.green);
+            g2.drawString("Time:" +dFormat.format(playTime),0,30);
         }
         if (gp.gameState == gp.pauseState) {
-            drawPauseScreen(g2);
+            drawPauseScreen();
         }
         if (gp.gameState == gp.gameOverState){
             drawEndScreen();
@@ -87,11 +85,12 @@ public class UI {
 
     }
 
-    private void drawPauseScreen(Graphics2D g2) {
+    private void drawPauseScreen() {
         centerMessage("Paused",Color.YELLOW);
     }
     private void drawEndScreen() {
         centerMessage("Game Over",Color.RED);
+        g2.drawString("Time:" +dFormat.format(playTime),gp.centerX - 87,gp.centerY + 50);
     }
 
     private void centerMessage(String text,Color color){
