@@ -4,6 +4,7 @@ public class CenterHexagon {
 
     GamePanel gp;
     public CenterHexagon(GamePanel gp) {
+
         this.gp = gp;
 
         int hexRadius = 60;
@@ -15,11 +16,14 @@ public class CenterHexagon {
             yPoints[i] = (int) (gp.centerY + hexRadius * Math.sin(Math.toRadians(60 * i)));
         }
 
-        gp.g2.setPaint(new Color(90,72,159));
+        gp.g2.setPaint(new Color(90, 72, 159));
+
+        gp.g2.setStroke(new BasicStroke(4));
+
         for (int i = 0; i < 6; i++) {
             int targetX = (int) (gp.centerX + 500 * Math.cos(Math.toRadians(60 * i)));
             int targetY = (int) (gp.centerY + 500 * Math.sin(Math.toRadians(60 * i)));
-            gp.g2.drawLine(gp.centerX,gp.centerY, targetX, targetY);
+            gp.g2.drawLine(gp.centerX, gp.centerY, targetX, targetY);
         }
 
         Polygon hexagon = new Polygon(xPoints, yPoints, 6);

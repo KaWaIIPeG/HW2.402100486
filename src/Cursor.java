@@ -17,7 +17,7 @@ public class Cursor {
     public void draw(Graphics2D g2) {
 
         cursorNum();
-        g2.setColor(new Color(232, 26, 107));
+        g2.setColor(Color.yellow);
         g2.fillPolygon(xPoints, yPoints, 3);
     }
     public void update(double speed){

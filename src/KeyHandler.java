@@ -57,7 +57,7 @@ public class KeyHandler implements KeyListener {
             rightPressed = true;
         }
         if (code == KeyEvent.VK_ESCAPE) {
-            if (gp.gameState != gp.titleState) {
+            if (gp.gameState != gp.titleState && gp.gameState != gp.gameOverState) {
                 if (gp.gameState == gp.playState) {
                     gp.setGameState(gp.pauseState);
                 } else {

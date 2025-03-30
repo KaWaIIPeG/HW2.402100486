@@ -7,7 +7,6 @@ public class UI {
     Graphics2D g2;
     double playTime;
     DecimalFormat dFormat = new DecimalFormat("#0.00");
-    public double lastPlayTime = 0;
     public int commandNum = 0;
     public UI(GamePanel gp){
 
@@ -24,7 +23,7 @@ public class UI {
         }
         if (gp.gameState == gp.playState){
             playTime += (double)1/60;
-            g2.setColor(Color.green);
+            g2.setColor(Color.yellow);
             g2.drawString("Time:" +dFormat.format(playTime),0,30);
         }
         if (gp.gameState == gp.pauseState) {

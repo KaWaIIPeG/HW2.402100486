@@ -26,6 +26,7 @@ public class GamePanel extends JPanel implements Runnable {
     public UI ui = new UI(this);
     public Wall w = new Wall(this);
     List<Wall> walls = new ArrayList<>();
+    public long lastBackgroundChangeTime = System.currentTimeMillis();
 
     GamePanel() {
         this.setPreferredSize(new Dimension(500, 500));
@@ -68,8 +69,18 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
+        if (gameState == playState || gameState == pauseState) {
+            if (System.currentTimeMillis() - lastBackgroundChangeTime >= 1000) {
+                this.setBackground(getRandomColor());
+                lastBackgroundChangeTime = System.currentTimeMillis();
+            }
+        }
+        else {
+            this.setBackground(Color.BLACK);
+        }
+
         if (gameState == playState) {
-            cursor.update(0.05 + (speedCounter / 60) * 0.00045);
+            cursor.update(0.06 + (speedCounter / 60) * 0.0006);
 
             rotationAngle += 0.01 + (speedCounter / 60) * 0.0004;
             speedCounter++;
@@ -81,10 +92,6 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             w.spawnWalls(2 + (speedCounter / 60) * 0.07);
-
-            if (speedCounter > 3600) {
-                speedCounter = 3600;
-            }
 
             for (int i = 0; i < walls.size(); i++) {
                 Wall wall = walls.get(i);
@@ -107,9 +114,11 @@ public class GamePanel extends JPanel implements Runnable {
                 ui.playTime = 0;
                 speedCounter = 0;
                 counter = 0;
+                lastBackgroundChangeTime = System.currentTimeMillis();
             }
         }
     }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -145,8 +154,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         List<Color> colors = new ArrayList<>();
         colors.add(new Color(77,137,99));
-        colors.add(new Color(225,179,120));
-        colors.add(new Color(224,204,151));
+        colors.add(new Color(225,159,120));
+        colors.add(new Color(224,4,151));
         colors.add(new Color(236,121,154));
         colors.add(new Color(238,50,51));
         colors.add(new Color(168,74,92));
@@ -185,7 +194,7 @@ public class GamePanel extends JPanel implements Runnable {
             gameState = newState;
 
             if (gameState == playState) {
-//                playMusic(0);
+                playMusic(0);
             } else if (gameState == pauseState) {
                 sound.pause();
             }
