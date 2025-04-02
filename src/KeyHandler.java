@@ -26,16 +26,17 @@ public class KeyHandler implements KeyListener {
                 }
             }
             if (code == KeyEvent.VK_S){
+
                 gp.ui.commandNum++;
                 if (gp.ui.commandNum > 3){
                     gp.ui.commandNum = 0;
                 }
             }
             if (code == KeyEvent.VK_ENTER){
+
                 switch(gp.ui.commandNum){
                     case 0 :
-                        gp.gameState = gp.playState;
-                        gp.playMusic(0);
+                        gp.gameState = gp.nameState;
                         break;
                     case 1 :
                         //add later.
@@ -46,6 +47,15 @@ public class KeyHandler implements KeyListener {
                     case 3 :
                         System.exit(0);
                         break;
+                }
+            }
+        }
+
+        if (gp.gameState == gp.nameState) {
+            if (code == KeyEvent.VK_ENTER) {
+                // Let the JTextField's ActionListener handle the transition
+                if (gp.ui.textField != null) {
+                    gp.ui.textField.postActionEvent(); // Trigger the ActionListener
                 }
             }
         }

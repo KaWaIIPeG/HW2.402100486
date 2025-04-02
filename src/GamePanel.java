@@ -12,6 +12,8 @@ public class GamePanel extends JPanel implements Runnable {
     public final int playState = 1;
     public final int pauseState = 2;
     public final int gameOverState = 3;
+    public final int nameState = 4;
+    private Color savedBackgroundColor = Color.BLACK;
     public Graphics2D g2;
     public int centerX = 250;
     public int centerY = 250;
@@ -44,48 +46,56 @@ public class GamePanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        double drawInterval = 1_000_000_000 / FPS;
-        double nextDrawTime = System.nanoTime() + drawInterval;
+            double drawInterval = 1_000_000_000 / FPS;
+            double nextDrawTime = System.nanoTime() + drawInterval;
 
-        while (gameThread != null) {
-            update();
-            repaint();
+            while (gameThread != null) {
+                update();
+                repaint();
 
-            try {
-                double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime = remainingTime / 1_000_000;
+                try {
+                    double remainingTime = nextDrawTime - System.nanoTime();
+                    remainingTime = remainingTime / 1_000_000;
 
-                if (remainingTime < 0) {
-                    remainingTime = 0;
+                    if (remainingTime < 0) {
+                        remainingTime = 0;
+                    }
+
+                    Thread.sleep((long) remainingTime);
+                    nextDrawTime += drawInterval;
+
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-
-                Thread.sleep((long) remainingTime);
-                nextDrawTime += drawInterval;
-
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
         }
-    }
 
     public void update() {
-        if (gameState == playState || gameState == pauseState) {
+        if (gameState == playState) {
+
             if (System.currentTimeMillis() - lastBackgroundChangeTime >= 1000) {
-                this.setBackground(getRandomColor());
+
+                savedBackgroundColor = getRandomColor();
+                this.setBackground(savedBackgroundColor);
                 lastBackgroundChangeTime = System.currentTimeMillis();
             }
-        }
-        else {
+        } else if (gameState == pauseState) {
+
+            this.setBackground(savedBackgroundColor);
+        } else {
+
             this.setBackground(Color.BLACK);
         }
 
         if (gameState == playState) {
+
             cursor.update(0.06 + (speedCounter / 60) * 0.0006);
 
             rotationAngle += 0.01 + (speedCounter / 60) * 0.0004;
             speedCounter++;
 
             if (speedCounter % 60 == 0) {
+
                 for (Wall wall : walls) {
                     wall.speed += 0.07;
                 }
@@ -94,10 +104,12 @@ public class GamePanel extends JPanel implements Runnable {
             w.spawnWalls(2 + (speedCounter / 60) * 0.07);
 
             for (int i = 0; i < walls.size(); i++) {
+
                 Wall wall = walls.get(i);
                 wall.update(rotationAngle);
 
                 if (wall.distance <= 0) {
+
                     walls.remove(i);
                     i--;
                 }
@@ -106,14 +118,17 @@ public class GamePanel extends JPanel implements Runnable {
             handleCollision();
 
         } else if (gameState == gameOverState) {
+
             counter++;
             if (counter > 120) {
+
                 gameState = titleState;
                 w.wallSpawnTimer = 0;
                 rotationAngle = 0.01;
                 ui.playTime = 0;
                 speedCounter = 0;
                 counter = 0;
+                savedBackgroundColor = Color.BLACK;
                 lastBackgroundChangeTime = System.currentTimeMillis();
             }
         }
@@ -126,10 +141,11 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (gameState == titleState) {
             ui.draw(g2);
-
         } else if (gameState == gameOverState) {
             ui.draw(g2);
-
+        } else if (gameState == nameState) {
+            ui.draw(g2);
+            return;
         } else {
             AffineTransform originalTransform = g2.getTransform();
 

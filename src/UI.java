@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 import java.text.DecimalFormat;
 
@@ -7,6 +8,7 @@ public class UI {
     Graphics2D g2;
     double playTime;
     DecimalFormat dFormat = new DecimalFormat("#0.00");
+    public JTextField textField;
     public int commandNum = 0;
     public UI(GamePanel gp){
 
@@ -21,19 +23,60 @@ public class UI {
         if (gp.gameState == gp.titleState){
             drawTitleScreen();
         }
-        if (gp.gameState == gp.playState){
-            playTime += (double)1/60;
-            g2.setColor(Color.yellow);
-            g2.drawString("Time:" +dFormat.format(playTime),0,30);
-        }
         if (gp.gameState == gp.pauseState) {
             drawPauseScreen();
         }
         if (gp.gameState == gp.gameOverState){
             drawEndScreen();
         }
+        if (gp.gameState == gp.nameState){
+            drawNameScreen();
+        }
+        if (gp.gameState == gp.playState){
+            playTime += (double)1/60;
+            g2.setColor(Color.yellow);
+            g2.drawString("Time:" +dFormat.format(playTime),0,30);
+        }
     }
-    private void drawTitleScreen() {
+    private void drawNameScreen() {
+        if (textField == null) {
+            gp.setLayout(new BoxLayout(gp, BoxLayout.Y_AXIS));
+
+            JLabel nameLabel = new JLabel("Please enter your name:");
+            nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            nameLabel.setForeground(Color.WHITE);
+            nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            textField = new JTextField();
+            textField.setPreferredSize(new Dimension(250, 40));
+            textField.setForeground(Color.RED);
+            textField.setBackground(Color.GREEN);
+            textField.setMaximumSize(new Dimension(250, 40));
+            textField.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            textField.addActionListener(e -> {
+                String playerName = textField.getText();
+                System.out.println("Player Name: " + playerName);
+
+                gp.gameState = gp.playState;
+                gp.playMusic(0);
+
+                gp.remove(nameLabel);
+                gp.remove(textField);
+                textField = null;
+                gp.requestFocus();
+            });
+
+            gp.add(Box.createVerticalGlue());
+            gp.add(nameLabel);
+            gp.add(Box.createVerticalStrut(10));
+            gp.add(textField);
+            gp.add(Box.createVerticalGlue());
+            textField.requestFocusInWindow();
+
+            gp.revalidate();
+        }
+    }    private void drawTitleScreen() {
 
         g2.setFont(g2.getFont().deriveFont(Font.ITALIC,50));
         String text = "Super Hexagon";
