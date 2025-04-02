@@ -44,7 +44,7 @@ public class UI {
 
             JLabel nameLabel = new JLabel("Please enter your name:");
             nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-            nameLabel.setForeground(Color.WHITE);
+            nameLabel.setForeground(Color.WHITE); // Text color
             nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             textField = new JTextField();
@@ -67,6 +67,8 @@ public class UI {
                 gp.requestFocus();
             });
 
+            gp.removeAll();
+
             gp.add(Box.createVerticalGlue());
             gp.add(nameLabel);
             gp.add(Box.createVerticalStrut(10));
@@ -75,8 +77,10 @@ public class UI {
             textField.requestFocusInWindow();
 
             gp.revalidate();
+            gp.repaint();
         }
-    }    private void drawTitleScreen() {
+    }
+    private void drawTitleScreen() {
 
         g2.setFont(g2.getFont().deriveFont(Font.ITALIC,50));
         String text = "Super Hexagon";
