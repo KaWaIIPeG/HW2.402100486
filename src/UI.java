@@ -1,5 +1,10 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.List;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.text.DecimalFormat;
 
 public class UI {
@@ -32,12 +37,48 @@ public class UI {
         if (gp.gameState == gp.nameState){
             drawNameScreen();
         }
+        if (gp.gameState == gp.runsState){
+            drawRunsScreen();
+        }
         if (gp.gameState == gp.playState){
             playTime += (double)1/60;
             g2.setColor(Color.yellow);
             g2.drawString("Time:" +dFormat.format(playTime),0,30);
         }
     }
+
+    public void drawRunsScreen() {
+        try {
+            ObjectMapper objMapper = new ObjectMapper();
+            File file = new File("C:\\Users\\GS\\HW2.402100486\\src\\players.json");
+
+            if (!file.exists() || file.length() == 0) {
+                g2.setFont(new Font("Arial", Font.BOLD, 20));
+                g2.setColor(Color.RED);
+                g2.drawString("No player data found.", 100, 100);
+                return;
+            }
+
+            List<Runs> players = objMapper.readValue(file, new TypeReference<List<Runs>>() {});
+
+            g2.setFont(new Font("Monospaced", Font.PLAIN, 16));
+            g2.setColor(Color.WHITE);
+
+            int yPosition = 50;
+            for (Runs run : players) {
+                String formattedTime = dFormat.format(run.getTime());
+                String playerData = "Name: " + run.getName() + ", Time: " + formattedTime + " seconds, Date: " + run.getDate();
+                g2.drawString(playerData, 50, yPosition);
+                yPosition += 30;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            g2.setFont(new Font("Arial", Font.BOLD, 20));
+            g2.setColor(Color.RED);
+            g2.drawString("An error occurred while displaying player data.", 100, 100);
+        }
+    }
+
     private void drawNameScreen() {
         if (textField == null) {
             gp.setLayout(new BoxLayout(gp, BoxLayout.Y_AXIS));
@@ -56,7 +97,8 @@ public class UI {
 
             textField.addActionListener(e -> {
                 String playerName = textField.getText();
-                System.out.println("Player Name: " + playerName);
+
+                gp.run.setName(playerName);
 
                 gp.gameState = gp.playState;
                 gp.playMusic(0);

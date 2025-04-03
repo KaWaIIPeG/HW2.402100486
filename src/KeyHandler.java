@@ -39,7 +39,7 @@ public class KeyHandler implements KeyListener {
                         gp.gameState = gp.nameState;
                         break;
                     case 1 :
-                        //add later.
+                        gp.gameState = gp.runsState;
                         break;
                     case 2 :
                         //add later.
@@ -70,12 +70,13 @@ public class KeyHandler implements KeyListener {
             if (gp.gameState != gp.titleState && gp.gameState != gp.gameOverState) {
                 if (gp.gameState == gp.playState) {
                     gp.setGameState(gp.pauseState);
-                } else {
+                } else if (gp.gameState == gp.pauseState){
                     gp.setGameState(gp.playState);
+                }else if (gp.gameState == gp.runsState){
+                    gp.gameState = gp.titleState;
                 }
             }
         }
-
     }
 
     @Override

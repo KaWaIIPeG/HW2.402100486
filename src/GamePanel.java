@@ -13,6 +13,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int pauseState = 2;
     public final int gameOverState = 3;
     public final int nameState = 4;
+    public final int runsState = 5;
     private Color savedBackgroundColor = Color.BLACK;
     public Graphics2D g2;
     public int centerX = 250;
@@ -27,6 +28,7 @@ public class GamePanel extends JPanel implements Runnable {
     Sound sound = new Sound();
     public UI ui = new UI(this);
     public Wall w = new Wall(this);
+    public Runs run = new Runs();
     List<Wall> walls = new ArrayList<>();
     public long lastBackgroundChangeTime = System.currentTimeMillis();
 
@@ -120,8 +122,10 @@ public class GamePanel extends JPanel implements Runnable {
         } else if (gameState == gameOverState) {
 
             counter++;
-            if (counter > 120) {
+            run.setTime(ui.playTime);
 
+            if (counter > 120) {
+                run.saveInformation();
                 gameState = titleState;
                 w.wallSpawnTimer = 0;
                 rotationAngle = 0.01;
@@ -146,6 +150,8 @@ public class GamePanel extends JPanel implements Runnable {
         } else if (gameState == nameState) {
             ui.draw(g2);
             return;
+        } else if (gameState == runsState) {
+            ui.draw(g2);
         } else {
             AffineTransform originalTransform = g2.getTransform();
 
