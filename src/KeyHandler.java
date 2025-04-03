@@ -53,12 +53,21 @@ public class KeyHandler implements KeyListener {
 
         if (gp.gameState == gp.nameState) {
             if (code == KeyEvent.VK_ENTER) {
-                // Let the JTextField's ActionListener handle the transition
                 if (gp.ui.textField != null) {
-                    gp.ui.textField.postActionEvent(); // Trigger the ActionListener
+                    gp.ui.textField.postActionEvent();
                 }
             }
         }
+        if (gp.gameState == gp.runsState) {
+            if (code == KeyEvent.VK_W) {
+                gp.ui.scrollOffset = Math.max(0, gp.ui.scrollOffset - 20);
+            }
+            if (code == KeyEvent.VK_S) {
+                gp.ui.scrollOffset += 20;
+            }
+            gp.repaint();
+        }
+
 
         if (code == KeyEvent.VK_A){
             leftPressed = true;

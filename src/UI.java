@@ -1,5 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
@@ -12,6 +14,7 @@ public class UI {
     GamePanel gp;
     Graphics2D g2;
     double playTime;
+    public int scrollOffset = 0;
     DecimalFormat dFormat = new DecimalFormat("#0.00");
     public JTextField textField;
     public int commandNum = 0;
@@ -47,6 +50,7 @@ public class UI {
         }
     }
 
+    // Scrolling offset to track vertical position
     public void drawRunsScreen() {
         try {
             ObjectMapper objMapper = new ObjectMapper();
@@ -61,16 +65,31 @@ public class UI {
 
             List<Runs> players = objMapper.readValue(file, new TypeReference<List<Runs>>() {});
 
-            g2.setFont(new Font("Monospaced", Font.PLAIN, 16));
+            g2.setFont(new Font("Monospaced", Font.BOLD, 13));
             g2.setColor(Color.WHITE);
 
-            int yPosition = 50;
+            int frameWidth = gp.getWidth();
+            int yPosition = 20 - scrollOffset;
+            FontMetrics metrics = g2.getFontMetrics();
+            int lineHeight = metrics.getHeight();
+
             for (Runs run : players) {
                 String formattedTime = dFormat.format(run.getTime());
                 String playerData = "Name: " + run.getName() + ", Time: " + formattedTime + " seconds, Date: " + run.getDate();
-                g2.drawString(playerData, 50, yPosition);
-                yPosition += 30;
+                List<String> lines = wrapText(playerData, metrics, frameWidth - 20);
+                for (String line : lines) {
+                    if (yPosition > 0 && yPosition < gp.getHeight()) {
+                        g2.drawString(line, 10, yPosition);
+                    }
+                    yPosition += lineHeight;
+                }
+                yPosition += 10;
             }
+
+            g2.setFont(new Font("Arial", Font.ITALIC, 10));
+            g2.setColor(Color.GRAY);
+            g2.drawString("Use W/S keys to scroll or 'ESC' to go back.", 12, gp.getHeight() - 10);
+
         } catch (Exception e) {
             e.printStackTrace();
             g2.setFont(new Font("Arial", Font.BOLD, 20));
@@ -79,13 +98,31 @@ public class UI {
         }
     }
 
+    private List<String> wrapText(String text, FontMetrics metrics, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : text.split(" ")) {
+            if (metrics.stringWidth(currentLine.toString() + word) > maxWidth) {
+                lines.add(currentLine.toString().trim());
+                currentLine = new StringBuilder(word + " ");
+            } else {
+                currentLine.append(word).append(" ");
+            }
+        }
+
+        if (!currentLine.toString().isEmpty()) {
+            lines.add(currentLine.toString().trim());
+        }
+        return lines;
+    }
     private void drawNameScreen() {
         if (textField == null) {
             gp.setLayout(new BoxLayout(gp, BoxLayout.Y_AXIS));
 
             JLabel nameLabel = new JLabel("Please enter your name:");
             nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-            nameLabel.setForeground(Color.WHITE); // Text color
+            nameLabel.setForeground(Color.WHITE);
             nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             textField = new JTextField();
@@ -171,6 +208,9 @@ public class UI {
         g2.setColor(Color.GRAY);
         g2.drawString(text,gp.centerX - 220,gp.centerY + 135);
 
+        g2.setFont(new Font("Arial", Font.ITALIC, 10));
+        g2.setColor(Color.GRAY);
+        g2.drawString("Use 'W/S' keys to move and 'Enter' to select ", 12, gp.getHeight() - 10);
     }
 
     private void drawPauseScreen() {
