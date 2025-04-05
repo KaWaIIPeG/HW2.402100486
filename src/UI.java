@@ -17,7 +17,12 @@ public class UI {
     public int scrollOffset = 0;
     DecimalFormat dFormat = new DecimalFormat("#0.00");
     public JTextField textField;
-    public int commandNum = 0;
+    public JButton button1,button2,button3,button4,button5;
+    public JRadioButton musicOn,musicOff,saveOn,saveOff;
+    public ButtonGroup saveGroup,musicGroup;
+    public boolean musicEnabled = true;
+    public boolean saveEnabled = true;
+    String BestFormattedTime = "0";
     public UI(GamePanel gp){
 
         this.gp = gp;
@@ -43,14 +48,88 @@ public class UI {
         if (gp.gameState == gp.runsState){
             drawRunsScreen();
         }
+        if (gp.gameState == gp.settingState){
+            drawSettingScreen();
+        }
         if (gp.gameState == gp.playState){
             playTime += (double)1/60;
             g2.setColor(Color.yellow);
+            g2.setFont(new Font("Arial", Font.BOLD, 20));
             g2.drawString("Time:" +dFormat.format(playTime),0,30);
+            g2.drawString("Best Run: "+ BestFormattedTime , 0,80);
         }
     }
+    private void drawSettingScreen() {
+        gp.setLayout(null);
 
-    // Scrolling offset to track vertical position
+        musicOn = new JRadioButton("Music: ON");
+        musicOn.setFont(new Font("Arial", Font.BOLD, 16));
+        musicOn.setBackground(Color.BLACK);
+        musicOn.setForeground(Color.WHITE);
+        musicOn.setFocusable(false);
+        musicOn.setBounds(50, 50, 200, 30);
+
+        musicOff = new JRadioButton("Music: OFF");
+        musicOff.setFont(new Font("Arial", Font.BOLD, 16));
+        musicOff.setBackground(Color.BLACK);
+        musicOff.setForeground(Color.WHITE);
+        musicOff.setFocusable(false);
+        musicOff.setBounds(50, 90, 200, 30);
+
+        if (musicEnabled) {
+            musicOn.setSelected(true);
+        } else {
+            musicOff.setSelected(true);
+        }
+
+        musicOn.addActionListener(e -> this.musicEnabled = true);
+        musicOff.addActionListener(e -> this.musicEnabled = false);
+
+        musicGroup = new ButtonGroup();
+        musicGroup.add(musicOn);
+        musicGroup.add(musicOff);
+
+        saveOn = new JRadioButton("Save Runs: ON");
+        saveOn.setFont(new Font("Arial", Font.BOLD, 16));
+        saveOn.setBackground(Color.BLACK);
+        saveOn.setForeground(Color.WHITE);
+        saveOn.setFocusable(false);
+        saveOn.setBounds(50, 150, 200, 30);
+
+        saveOff = new JRadioButton("Save Runs: OFF");
+        saveOff.setFont(new Font("Arial", Font.BOLD, 16));
+        saveOff.setBackground(Color.BLACK);
+        saveOff.setForeground(Color.WHITE);
+        saveOff.setFocusable(false);
+        saveOff.setBounds(50, 190, 200, 30);
+
+        if (saveEnabled) {
+            saveOn.setSelected(true);
+        } else {
+            saveOff.setSelected(true);
+        }
+
+        saveOn.addActionListener(e -> this.saveEnabled = true);
+        saveOff.addActionListener(e -> this.saveEnabled = false);
+
+        saveGroup = new ButtonGroup();
+        saveGroup.add(saveOn);
+        saveGroup.add(saveOff);
+
+        gp.add(musicOn);
+        gp.add(musicOff);
+        gp.add(saveOn);
+        gp.add(saveOff);
+
+        JLabel instructionLabel = new JLabel("Press 'ESC' to go back.");
+        instructionLabel.setFont(new Font("Arial", Font.ITALIC, 14));
+        instructionLabel.setForeground(Color.GRAY);
+        instructionLabel.setBounds(12, gp.getHeight() - 40, 300, 20);
+        gp.add(instructionLabel);
+
+        gp.revalidate();
+        gp.repaint();
+    }
     public void drawRunsScreen() {
         try {
             ObjectMapper objMapper = new ObjectMapper();
@@ -75,7 +154,7 @@ public class UI {
 
             for (Runs run : players) {
                 String formattedTime = dFormat.format(run.getTime());
-                String playerData = "Name: " + run.getName() + ", Time: " + formattedTime + " seconds, Date: " + run.getDate();
+                String playerData = "Name: " + run.getName() + ", Time: " + formattedTime + ", Date: " + run.getDate();
                 List<String> lines = wrapText(playerData, metrics, frameWidth - 20);
                 for (String line : lines) {
                     if (yPosition > 0 && yPosition < gp.getHeight()) {
@@ -86,7 +165,7 @@ public class UI {
                 yPosition += 10;
             }
 
-            g2.setFont(new Font("Arial", Font.ITALIC, 10));
+            g2.setFont(new Font("Arial", Font.ITALIC, 14));
             g2.setColor(Color.GRAY);
             g2.drawString("Use W/S keys to scroll or 'ESC' to go back.", 12, gp.getHeight() - 10);
 
@@ -132,32 +211,57 @@ public class UI {
             textField.setMaximumSize(new Dimension(250, 40));
             textField.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            textField.addActionListener(e -> {
-                String playerName = textField.getText();
+            JLabel errorLabel = new JLabel("");
+            errorLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            errorLabel.setForeground(Color.RED);
+            errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-                gp.run.setName(playerName);
+            button1 = new JButton();
+            button1.setAlignmentX(Component.CENTER_ALIGNMENT);
+            button1.setText("Start");
+            button1.setFocusable(false);
+            button1.addActionListener(e -> {
+                String playerName = textField.getText().trim();
 
-                gp.gameState = gp.playState;
-                gp.playMusic(0);
+                if (playerName.isEmpty()) {
+                    errorLabel.setText("The Name Cannot Be Empty.");
+                } else {
+                    gp.run.setName(playerName);
 
-                gp.remove(nameLabel);
-                gp.remove(textField);
-                textField = null;
-                gp.requestFocus();
+                    gp.gameState = gp.playState;
+                    if (musicEnabled){
+                        gp.playMusic(0);
+                    }
+                    gp.remove(nameLabel);
+                    gp.remove(textField);
+                    gp.remove(button1);
+                    gp.remove(errorLabel);
+                    textField = null;
+                    gp.requestFocus();
+                }
+
+                gp.revalidate();
+                gp.repaint();
             });
 
             gp.removeAll();
-
             gp.add(Box.createVerticalGlue());
             gp.add(nameLabel);
             gp.add(Box.createVerticalStrut(10));
             gp.add(textField);
+            gp.add(Box.createVerticalStrut(10));
+            gp.add(errorLabel);
+            gp.add(Box.createVerticalStrut(20));
+            gp.add(button1);
             gp.add(Box.createVerticalGlue());
             textField.requestFocusInWindow();
 
             gp.revalidate();
             gp.repaint();
         }
+        g2.setFont(new Font("Arial", Font.ITALIC, 14));
+        g2.setColor(Color.GRAY);
+        g2.drawString("Use A/D keys to move the cursor and use 'ESC' anytime to pause the game.", 12, gp.getHeight() - 10);
     }
     private void drawTitleScreen() {
 
@@ -178,41 +282,85 @@ public class UI {
         g2.setColor(Color.YELLOW);
         g2.drawString(text,gp.centerX - 220,gp.centerY + 200);
 
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD,30));
-        text = "New Game";
-        g2.setColor(Color.WHITE);
-        g2.drawString(text,gp.centerX - 80,gp.centerY - 70);
-        if (commandNum == 0){
-            g2.drawString(">" , gp.centerX - 110,gp.centerY - 70);
+        button2 = new JButton();
+        button2.setBounds(gp.centerX - 80,gp.centerY - 100,150,40);
+        button2.setText("New Game");
+        button2.setFocusable(false);
+        gp.add(button2);
+        button2.addActionListener(e -> {
+            gp.gameState = gp.nameState;
+            gp.removeAll();
+            gp.revalidate();
+            gp.repaint();
+        });
+
+        button3 = new JButton();
+        button3.setBounds(gp.centerX - 80,gp.centerY - 50,150,40);
+        button3.setText("Previous Runs");
+        button3.setFocusable(false);
+        gp.add(button3);
+        button3.addActionListener(e -> {
+            gp.gameState = gp.runsState;
+            gp.removeAll();
+            gp.revalidate();
+            gp.repaint();
+        });
+
+        button4 = new JButton();
+        button4.setBounds(gp.centerX - 80,gp.centerY ,150,40);
+        button4.setText("Settings");
+        button4.setFocusable(false);
+        gp.add(button4);
+        button4.addActionListener(e -> {
+            gp.gameState = gp.settingState;
+            gp.removeAll();
+            gp.revalidate();
+            gp.repaint();
+        });
+
+        button5 = new JButton();
+        button5.setBounds(gp.centerX - 80,gp.centerY + 50,150,40);
+        button5.setText("Quit");
+        button5.setFocusable(false);
+        gp.add(button5);
+        button5.addActionListener(e -> System.exit(0));
+
+        try {
+            ObjectMapper objMapper = new ObjectMapper();
+            File file = new File("C:\\Users\\GS\\HW2.402100486\\src\\players.json");
+
+            if (!file.exists() || file.length() == 0) {
+                text = "Best run: 0";
+                g2.setFont(g2.getFont().deriveFont(Font.BOLD,18));
+                g2.setColor(Color.GRAY);
+                g2.drawString(text,gp.centerX - 220,gp.centerY + 135);
+                return;
+            }
+            List<Runs> players = objMapper.readValue(file, new TypeReference<List<Runs>>() {});
+
+            Runs bestPlayer = null;
+            for (Runs player : players) {
+                if (bestPlayer == null || player.getTime() > bestPlayer.getTime()) {
+                    bestPlayer = player;
+                }
+            }
+
+            if (bestPlayer != null) {
+                BestFormattedTime = dFormat.format(bestPlayer.getTime());
+                text = "Best run: " + BestFormattedTime;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            g2.setFont(new Font("Arial", Font.BOLD, 20));
+            g2.setColor(Color.RED);
+            g2.drawString("An error occurred while displaying the best time.", 100, 100);
         }
 
-        text = "Previous Runs";
-        g2.drawString(text,gp.centerX - 80,gp.centerY - 30);
-        if (commandNum == 1){
-            g2.drawString(">" , gp.centerX - 110,gp.centerY - 30);
-        }
-
-        text = "Settings";
-        g2.drawString(text,gp.centerX - 80,gp.centerY + 10);
-        if (commandNum == 2){
-            g2.drawString(">" , gp.centerX - 110,gp.centerY + 10);
-        }
-
-        text = "Quit";
-        g2.drawString(text,gp.centerX - 80,gp.centerY + 50);
-        if (commandNum == 3){
-            g2.drawString(">" , gp.centerX - 110,gp.centerY + 50);
-        }
-
-        text = "Best run:";
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD,18));
         g2.setColor(Color.GRAY);
         g2.drawString(text,gp.centerX - 220,gp.centerY + 135);
 
-        g2.setFont(new Font("Arial", Font.ITALIC, 10));
-        g2.setColor(Color.GRAY);
-        g2.drawString("Use 'W/S' keys to move and 'Enter' to select ", 12, gp.getHeight() - 10);
     }
-
     private void drawPauseScreen() {
         centerMessage("Paused",Color.YELLOW);
     }

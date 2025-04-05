@@ -18,46 +18,6 @@ public class KeyHandler implements KeyListener {
 
         int code = e.getKeyCode();
 
-        if (gp.gameState == gp.titleState){
-            if (code == KeyEvent.VK_W){
-                gp.ui.commandNum--;
-                if (gp.ui.commandNum < 0){
-                    gp.ui.commandNum = 3;
-                }
-            }
-            if (code == KeyEvent.VK_S){
-
-                gp.ui.commandNum++;
-                if (gp.ui.commandNum > 3){
-                    gp.ui.commandNum = 0;
-                }
-            }
-            if (code == KeyEvent.VK_ENTER){
-
-                switch(gp.ui.commandNum){
-                    case 0 :
-                        gp.gameState = gp.nameState;
-                        break;
-                    case 1 :
-                        gp.gameState = gp.runsState;
-                        break;
-                    case 2 :
-                        //add later.
-                        break;
-                    case 3 :
-                        System.exit(0);
-                        break;
-                }
-            }
-        }
-
-        if (gp.gameState == gp.nameState) {
-            if (code == KeyEvent.VK_ENTER) {
-                if (gp.ui.textField != null) {
-                    gp.ui.textField.postActionEvent();
-                }
-            }
-        }
         if (gp.gameState == gp.runsState) {
             if (code == KeyEvent.VK_W) {
                 gp.ui.scrollOffset = Math.max(0, gp.ui.scrollOffset - 20);
@@ -81,7 +41,12 @@ public class KeyHandler implements KeyListener {
                     gp.setGameState(gp.pauseState);
                 } else if (gp.gameState == gp.pauseState){
                     gp.setGameState(gp.playState);
-                }else if (gp.gameState == gp.runsState){
+                } else if (gp.gameState == gp.runsState){
+                    gp.gameState = gp.titleState;
+                } else if (gp.gameState == gp.settingState) {
+                    gp.removeAll();
+                    gp.revalidate();
+                    gp.repaint();
                     gp.gameState = gp.titleState;
                 }
             }

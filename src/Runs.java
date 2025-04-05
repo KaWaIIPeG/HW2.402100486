@@ -12,6 +12,7 @@ public class Runs {
     private String name;
     private double time;
     private String date;
+    List<Runs> players;
 
     private static final DecimalFormat timeFormat = new DecimalFormat("0.00");
 
@@ -44,7 +45,7 @@ public class Runs {
         try {
             ObjectMapper objMapper = new ObjectMapper();
             File file = new File("C:\\Users\\GS\\HW2.402100486\\src\\players.json");
-            List<Runs> players = new ArrayList<>();
+            players = new ArrayList<>();
 
             if (file.exists() && file.length() > 0) {
                 players = objMapper.readValue(file, new TypeReference<List<Runs>>() {});

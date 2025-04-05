@@ -1,9 +1,11 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
+import java.io.File;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -14,6 +16,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int gameOverState = 3;
     public final int nameState = 4;
     public final int runsState = 5;
+    public final int settingState = 6;
     private Color savedBackgroundColor = Color.BLACK;
     public Graphics2D g2;
     public int centerX = 250;
@@ -125,7 +128,9 @@ public class GamePanel extends JPanel implements Runnable {
             run.setTime(ui.playTime);
 
             if (counter > 120) {
-                run.saveInformation();
+                if (ui.saveEnabled){
+                    run.saveInformation();
+                }
                 gameState = titleState;
                 w.wallSpawnTimer = 0;
                 rotationAngle = 0.01;
@@ -145,6 +150,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (gameState == titleState) {
             ui.draw(g2);
+            return;
         } else if (gameState == gameOverState) {
             ui.draw(g2);
         } else if (gameState == nameState) {
@@ -152,6 +158,9 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         } else if (gameState == runsState) {
             ui.draw(g2);
+        } else if (gameState == settingState) {
+            ui.draw(g2);
+            return;
         } else {
             AffineTransform originalTransform = g2.getTransform();
 
@@ -216,9 +225,14 @@ public class GamePanel extends JPanel implements Runnable {
             gameState = newState;
 
             if (gameState == playState) {
-                playMusic(0);
+                if (ui.musicEnabled){
+                    playMusic(0);
+                }
+
             } else if (gameState == pauseState) {
-                sound.pause();
+                if (ui.musicEnabled){
+                    sound.pause();
+                }
             }
         }
     }
