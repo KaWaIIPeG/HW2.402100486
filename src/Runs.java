@@ -44,7 +44,7 @@ public class Runs {
     public void saveInformation() {
         try {
             ObjectMapper objMapper = new ObjectMapper();
-            File file = new File("C:\\Users\\GS\\HW2.402100486\\src\\players.json");
+            File file = new File("src/players.json");
             players = new ArrayList<>();
 
             if (file.exists() && file.length() > 0) {

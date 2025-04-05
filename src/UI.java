@@ -133,7 +133,7 @@ public class UI {
     public void drawRunsScreen() {
         try {
             ObjectMapper objMapper = new ObjectMapper();
-            File file = new File("C:\\Users\\GS\\HW2.402100486\\src\\players.json");
+            File file = new File("src/players.json");
 
             if (!file.exists() || file.length() == 0) {
                 g2.setFont(new Font("Arial", Font.BOLD, 20));
@@ -327,7 +327,7 @@ public class UI {
 
         try {
             ObjectMapper objMapper = new ObjectMapper();
-            File file = new File("C:\\Users\\GS\\HW2.402100486\\src\\players.json");
+            File file = new File("src/players.json");
 
             if (!file.exists() || file.length() == 0) {
                 text = "Best run: 0";

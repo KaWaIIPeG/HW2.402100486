@@ -9,7 +9,7 @@
         long clipTimePosition = 0;
 
         public Sound() {
-            soundFilePaths[0] = "C:\\Users\\GS\\HW2.402100486\\sound\\01 Courtesy.wav";
+            soundFilePaths[0] = "sound/01 Courtesy.wav";
         }
 
         public void setFile(int i) {
