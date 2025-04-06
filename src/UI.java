@@ -264,6 +264,8 @@ public class UI {
         g2.drawString("Use A/D keys to move the cursor and use 'ESC' anytime to pause the game.", 12, gp.getHeight() - 10);
     }
     private void drawTitleScreen() {
+        
+        gp.setLayout(null);
 
         g2.setFont(g2.getFont().deriveFont(Font.ITALIC,50));
         String text = "Super Hexagon";
@@ -323,7 +325,12 @@ public class UI {
         button5.setText("Quit");
         button5.setFocusable(false);
         gp.add(button5);
-        button5.addActionListener(e -> System.exit(0));
+        button5.addActionListener(e -> {
+            System.exit(0);
+            gp.removeAll();
+            gp.revalidate();
+            gp.repaint();
+        });
 
         try {
             ObjectMapper objMapper = new ObjectMapper();
